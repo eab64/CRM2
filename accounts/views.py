@@ -1,11 +1,16 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
+from django.forms import inlineformset_factory
 from django.shortcuts import render, redirect
 from .models import *
 from .forms import OrderForm, CreateUserForm
+from .filters import OrderFilter
+from django.contrib.auth.decorators import login_required
+from .decorators import unauthenticated_user
 
 
+@login_required(login_url='login')
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
@@ -25,6 +30,11 @@ def home(request):
     }
     return render(request, 'accounts/dashboard.html', context)
 
+
+def userPage(request):
+	context = {}
+	return render(request, 'accounts/user.html', context)
+
 def products(request):
     products = Product.objects.all()
     return render(request, 'accounts/products.html', {
@@ -37,20 +47,29 @@ def customer(request, pk_test):
 
     orders = customer.order_set.all()
     order_count = orders.count()
-    context = {'customer':customer, 'orders':orders, 'order_count':order_count}
+    myFilter = OrderFilter(request.GET, queryset=orders)
+    orders = myFilter.qs
+    context = {'customer':customer, 'orders':orders,
+               'order_count':order_count, 'myFilter':myFilter}
     return render(request, 'accounts/customer.html', context)
 
-def createOrder(request):
-    form = OrderForm
-    if request.method == "POST":
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/')
-    context = {'form':form}
+def createOrder(request, pk):
+	OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10 )
+	customer = Customer.objects.get(id=pk)
+	formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
+	#form = OrderForm(initial={'customer':customer})
+	if request.method == 'POST':
+		#print('Printing POST:', request.POST)
+		#form = OrderForm(request.POST)
+		formset = OrderFormSet(request.POST, instance=customer)
+		if formset.is_valid():
+			formset.save()
+			return redirect('/')
 
-    return render(request,'accounts/order_form.html' , context)
+	context = {'form':formset}
+	return render(request, 'accounts/order_form.html', context)
 
+@login_required(login_url='login')
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
@@ -64,6 +83,7 @@ def updateOrder(request, pk):
     context = {'form':form}
     return render(request, 'accounts/order_form.html', context)
 
+@login_required(login_url='login')
 def deleteOrder(request,pk):
     order = Order.objects.get(id=pk)
     if request.method=="POST":
@@ -77,10 +97,9 @@ def main(request):
     return render(request,'accounts/main.html' )
 
 
-
+@unauthenticated_user
 def registerPage(request):
     form = CreateUserForm()
-
     if request.method == "POST":
         form = CreateUserForm(request.POST)
         if form.is_valid():
@@ -92,7 +111,10 @@ def registerPage(request):
     context = {'form':form}
     return render(request, 'accounts/register.html', context)
 
+
+@unauthenticated_user
 def loginPage(request):
+
     if request.method=="POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -102,5 +124,13 @@ def loginPage(request):
         if user is not None:
             login(request, user)
             return redirect('home')
+        else:
+            messages.info(request, 'Username or password is incorrect')
     context = {}
     return render(request, 'accounts/login.html', context)
+
+def logoutUser(request):
+    logout(request)
+    return redirect('login')
+
+
