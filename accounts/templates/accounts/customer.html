@@ -7,26 +7,26 @@
 <div class="row">
 	<div class="col-md">
 		<div class="card card-body">
-			<h5>Customer:</h5>
+			<h5>Заказчик:</h5>
 			<hr>
-			<a class="btn btn-outline-info  btn-sm btn-block" href="">Update Customer</a>
-			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'create_order' customer.id %}">New order</a>
+			<a class="btn btn-outline-info  btn-sm btn-block" href="">Обновить</a>
+			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'create_order' customer.id %}">Новый заказ</a>
 
 		</div>
 	</div>
 
 	<div class="col-md">
 		<div class="card card-body">
-			<h5>Contact Information</h5>
+			<h5>Информация о клиенте</h5>
 			<hr>
 			<p>Email: {{customer.email}}</p>
-			<p>Phone: {{customer.phone}}</p>
+			<p>Телефон: {{customer.phone}}</p>
 		</div>
 	</div>
 
 	<div class="col-md">
 		<div class="card card-body">
-			<h5>Total Orders</h5>
+			<h5>Общее количество заказов</h5>
 			<hr>
 			<h1 style="text-align: center;padding: 10px">{{order_count}}</h1>
 		</div>
@@ -42,7 +42,7 @@
 			<form method="get">
 				{{myFilter.form}}
 
-		    <button class="btn btn-primary" type="submit">Search</button>
+		    <button class="btn btn-primary" type="submit">Поиск</button>
 		  </form>
 		</div>
 	</div>
@@ -55,12 +55,12 @@
 		<div class="card card-body">
 			<table class="table table-sm">
 				<tr>
-					<th>Product</th>
-					<th>Note</th>
-					<th>Date Orderd</th>
-					<th>Status</th>
-					<th>Update</th>
-					<th>Remove</th>
+					<th>Товар</th>
+					<th>Описание</th>
+					<th>Дата заказа</th>
+					<th>Статус</th>
+					<th>Обновить</th>
+					<th>Удалить</th>
 				</tr>
 
 				{% for order in orders %}

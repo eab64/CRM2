@@ -1,8 +1,9 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Customer(models.Model):
+	user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
 	name = models.CharField(max_length=200, null=True)
 	phone = models.CharField(max_length=200, null=True)
 	email = models.CharField(max_length=200, null=True)
@@ -20,8 +21,8 @@ class Tag(models.Model):
 
 class Product(models.Model):
 	CATEGORY = (
-			('Indoor', 'Indoor'),
-			('Out Door', 'Out Door'),
+			('Для дома', 'Для дома'),
+			('Для производства', 'Для производства'),
 			)
 
 	name = models.CharField(max_length=200, null=True)
@@ -39,9 +40,9 @@ class Product(models.Model):
 
 class Order(models.Model):
 	STATUS = (
-			('Pending', 'Pending'),
-			('Out for delivery', 'Out for delivery'),
-			('Delivered', 'Delivered'),
+			('В ожиданий', 'В ожиданий'),
+			('В процессе доставки', 'В процессе доставки'),
+			('Доставлен', 'Доставлен'),
 			)
 
 	customer = models.ForeignKey(Customer, null=True, on_delete= models.SET_NULL)

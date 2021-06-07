@@ -1,4 +1,6 @@
 {% load static %}
+
+
 <style>
   .hello-msg{
     font-size: 18px;
@@ -14,16 +16,18 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
+      {% if request.user.is_staff %}
       <li class="nav-item active">
         <a class="nav-link" href="{% url 'home' %}">Главное меню</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'products' %}">Товары</a>
       </li>
+      {% endif %}
     </ul>
   </div>
 
-      <span class="hello-msg">Hello, {{request.user}}</span>
+  <span class="hello-msg">Здравствуйте, {{request.user}}</span>
   <span ><a  class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
 
 </nav>
